@@ -1,0 +1,14 @@
+{
+  "name": "netfilla-discover",
+  "version": "2.0.0",
+  "description": "NetFilla Streaming Platform with DISCOVER Global Entertainment Hub",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build:standalone": "node build-standalone.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "license": "MIT"
+}

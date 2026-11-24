@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/tmdb/(.*)",
+      "destination": "/api/tmdb?path=/$1"
+    },
+    {
+      "source": "/api/tvmaze/(.*)",
+      "destination": "/api/tvmaze?path=/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(css|js)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ]
+}

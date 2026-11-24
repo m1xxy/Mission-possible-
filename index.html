@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NetFilla - Global Streaming &amp; Discover Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+    <!-- TOAST NOTIFICATION -->
+    <div id="nf-toast"></div>
+
+    <!-- GLOBAL LOADING OVERLAY -->
+    <div id="global-loader" class="fixed inset-0 z-[1000] bg-black flex flex-col items-center justify-center">
+        <h1 class="text-5xl font-black text-[#E50914] mb-4 tracking-tighter animate-pulse font-akira">NetFilla</h1>
+        <div class="nf-spinner w-8 h-8 border-4 border-[#E50914] border-t-transparent animate-spin"></div>
+    </div>
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#000] px-6">
+        <div class="ios-card p-8 md:p-12 max-w-md w-full text-center">
+            <p class="text-[11px] font-black uppercase tracking-[0.28em] text-[#E50914] mb-3">GLOBAL CINEMA &amp; DISCOVERY</p>
+            <h1 class="text-5xl md:text-7xl font-black text-[#E50914] mb-5 tracking-tighter drop-shadow-[0_0_30px_rgba(229,9,20,0.45)]">NetFilla</h1>
+            <p class="text-gray-300 font-medium text-sm md:text-base mb-8">Unlimited cinematic movies, series, and the new global Discover release calendar.</p>
+            <button id="enter-btn" class="ios-btn-primary w-full py-4 font-black text-base uppercase tracking-wider active:scale-95">Get Started</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden">
+        <!-- GLOBAL HEADER (SEARCH FIXED TOP-RIGHT ON HOME, MOVIES & SERIES) -->
+        <header class="fixed top-0 left-0 right-0 pt-safe z-50 flex items-center justify-between px-4 md:px-6 pb-2 bg-gradient-to-b from-black/95 via-black/60 to-transparent pointer-events-none" id="app-header">
+            <div class="flex items-center gap-2 pointer-events-auto cursor-pointer" onclick="switchTab('home', document.getElementById('nav-home'))">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-md"><path d="M4 4L9 20L15 4L20 20" stroke="#E50914" stroke-width="4"/></svg>
+                <h1 class="text-xl font-black text-[#E50914] tracking-tighter drop-shadow-lg">NETFILLA</h1>
+            </div>
+            <div class="pointer-events-auto flex gap-2 items-center">
+                <button id="header-search-btn" onclick="switchTab('search')" class="text-white p-2.5 active:scale-95 bg-black/80 border border-white/25 hover:bg-white/15 transition-colors ios-glass-light" title="Search" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 1. HOME -->
+        <main id="view-home" class="app-view active !pt-0" onscroll="handleInfiniteScroll(event, 'home')">
+            <div class="relative w-full min-h-[64vh] bg-[#111] border-b border-white/15 overflow-hidden shadow-2xl flex flex-col justify-end">
+                <img id="home-hero-img" src="" class="absolute inset-0 w-full h-full object-cover opacity-80 transition-opacity duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/35 to-black/65 pointer-events-none"></div>
+                <div class="absolute top-[86px] left-0 w-full z-40 px-5 flex justify-start gap-5 text-[14px] font-bold text-white tracking-wide">
+                    <span onclick="switchTab('series', document.getElementById('nav-series'))" class="cursor-pointer border-b-2 border-transparent hover:border-white drop-shadow-lg transition-all">Shows</span>
+                    <span onclick="switchTab('movies', document.getElementById('nav-movies'))" class="cursor-pointer border-b-2 border-transparent hover:border-white drop-shadow-lg transition-all">Movies</span>
+                    <span onclick="switchTab('discover', document.getElementById('nav-discover'))" class="cursor-pointer border-b-2 border-[#E50914] text-white drop-shadow-lg transition-all">Discover Hub</span>
+                </div>
+                <div class="relative z-10 w-full flex flex-col items-center px-5 pb-8">
+                    <h2 id="home-hero-title" class="text-4xl md:text-5xl font-black mb-3 text-white uppercase tracking-tighter text-center" style="text-shadow: 0 6px 20px rgba(0,0,0,0.95);">Loading...</h2>
+                    <p class="text-[12px] font-bold text-gray-300 mb-6 tracking-widest drop-shadow-md">TRENDING • ACTION • CINEMATIC</p>
+                    <div class="flex gap-3 w-full max-w-sm">
+                        <button onclick="playHeroMovie('home')" class="ios-btn-primary flex-1 py-3 font-black flex items-center justify-center gap-2 active:scale-95 text-[14px] uppercase tracking-wider">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="black"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Play
+                        </button>
+                        <button onclick="saveHeroMovie('home')" class="flex-1 ios-glass-light text-white py-3 font-black flex items-center justify-center gap-2 active:scale-95 text-[14px] uppercase tracking-wider hover:bg-white/15">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Watchlist
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-8 pb-10 mt-6 overflow-hidden max-w-7xl mx-auto">
+                <div id="continue-watching-container" class="hidden">
+                    <h2 class="text-xl font-black mb-3 text-white px-5 tracking-tight uppercase">Continue Watching</h2>
+                    <div id="history-grid" class="flex gap-3 overflow-x-auto px-5 pb-2 no-scrollbar"></div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black mb-4 text-white px-5 tracking-tight uppercase">Top 10 TV Shows Today</h2>
+                    <div id="home-top10-grid" class="flex gap-5 overflow-x-auto pb-6 pt-2 pl-6 no-scrollbar"></div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black mb-3 text-white px-5 tracking-tight uppercase">Trending Now</h2>
+                    <div id="home-infinite-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 px-5 pb-4"></div>
+                    <div id="home-loader" class="hidden text-center py-4"><div class="nf-spinner animate-spin w-6 h-6 border-2 border-[#E50914] border-t-transparent mx-auto"></div></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 2. DISCOVER — GLOBAL ENTERTAINMENT HUB -->
+        <main id="view-discover" class="app-view relative !pt-[76px]">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
+                <!-- Discover Header & Global Search -->
+                <div class="ios-card p-4 md:p-5 mb-5">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-[#E50914] text-white text-[10px] font-black px-2 py-0.5 uppercase tracking-widest">DISCOVER</span>
+                                <span id="discover-region-badge" class="text-[11px] font-bold text-gray-300 border border-white/15 px-2 py-0.5 bg-white/5">United States (US)</span>
+                            </div>
+                            <h1 class="text-2xl md:text-3xl font-black text-white tracking-tight">Global Entertainment Hub</h1>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label for="discover-region-select" class="text-[11px] font-black uppercase tracking-wider text-gray-400">Country:</label>
+                            <select id="discover-region-select" onchange="window.nfDiscover.changeRegion(this.value)" class="bg-[#0a0a0d] text-white text-xs font-bold px-3 py-2 border border-white/20 outline-none focus:border-white cursor-pointer"></select>
+                        </div>
+                    </div>
+
+                    <!-- Prominent Global Search Bar inside Discover -->
+                    <div id="discover-search-wrap" class="relative mb-4">
+                        <div class="flex items-center bg-[#09090c] border border-white/20 px-4 py-3 focus-within:border-white transition-colors">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input id="discover-global-search" type="text" placeholder="Search movies, TV series, actors, directors, countries, film industries, platforms, genres..." class="bg-transparent border-none outline-none text-white w-full ml-3 text-sm font-medium placeholder-gray-500">
+                        </div>
+                        <div id="discover-search-dropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-[#0b0b0f] border border-white/25 z-50 max-h-[420px] overflow-y-auto shadow-[0_24px_60px_rgba(0,0,0,0.95)]"></div>
+                    </div>
+
+                    <!-- Discover Sub-Navigation Tabs -->
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar">
+                        <button onclick="window.nfDiscover.switchDiscoverSubTab('overview')" data-subtab="overview" class="discover-subtab-btn discover-tab-btn active px-4 py-2 text-xs font-black uppercase tracking-wider flex-shrink-0">Overview</button>
+                        <button onclick="window.nfDiscover.switchDiscoverSubTab('calendar')" data-subtab="calendar" class="discover-subtab-btn discover-tab-btn px-4 py-2 text-xs font-black uppercase tracking-wider flex-shrink-0">Release Calendar</button>
+                        <button onclick="window.nfDiscover.switchDiscoverSubTab('explore')" data-subtab="explore" class="discover-subtab-btn discover-tab-btn px-4 py-2 text-xs font-black uppercase tracking-wider flex-shrink-0">Industries, Platforms &amp; Genres</button>
+                        <button onclick="window.nfDiscover.switchDiscoverSubTab('preferences')" data-subtab="preferences" class="discover-subtab-btn discover-tab-btn px-4 py-2 text-xs font-black uppercase tracking-wider flex-shrink-0">My Preferences</button>
+                    </div>
+                </div>
+
+                <!-- Actor / Director Filmography Result Panel -->
+                <div id="discover-person-credits-panel" class="hidden ios-card p-4 mb-6">
+                    <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+                        <h3 id="discover-person-title" class="text-sm font-black uppercase tracking-wider text-white">Credits</h3>
+                        <button onclick="document.getElementById('discover-person-credits-panel').classList.add('hidden')" class="text-xs font-bold text-gray-400 hover:text-white px-2 py-1 border border-white/15">Close</button>
+                    </div>
+                    <div id="discover-person-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
+                </div>
+
+                <!-- DISCOVER PANEL 1: OVERVIEW -->
+                <section id="discover-panel-overview" class="discover-subpanel space-y-8">
+                    <!-- Quick Action Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div onclick="window.nfDiscover.switchDiscoverSubTab('calendar')" class="select-tile p-4 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-[#E50914]">INTERACTIVE SCHEDULE</span>
+                                <h3 class="text-base font-black text-white mt-0.5">Release Calendar</h3>
+                                <p class="text-xs text-gray-400">Monthly, weekly &amp; daily premieres with posters</p>
+                            </div>
+                            <span class="text-lg font-black text-white">→</span>
+                        </div>
+                        <div onclick="window.nfDiscover.switchDiscoverSubTab('explore')" class="select-tile p-4 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-400">GLOBAL FILTER STUDIO</span>
+                                <h3 class="text-base font-black text-white mt-0.5">Industries &amp; Platforms</h3>
+                                <p class="text-xs text-gray-400">21 film industries • 12+ platforms • 14 genres</p>
+                            </div>
+                            <span class="text-lg font-black text-white">→</span>
+                        </div>
+                        <div onclick="window.nfDiscover.switchDiscoverSubTab('preferences')" class="select-tile p-4 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-amber-300">FOR YOU</span>
+                                <h3 class="text-base font-black text-white mt-0.5">My Preferences</h3>
+                                <p class="text-xs text-gray-400">Personalize feeds, languages &amp; calendar</p>
+                            </div>
+                            <span class="text-lg font-black text-white">→</span>
+                        </div>
+                    </div>
+
+                    <!-- Personalized Picks (Visible when user has preferences saved) -->
+                    <div id="discover-personalized-section" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-black text-white uppercase tracking-tight">Recommended For You</h2>
+                            <button onclick="window.nfDiscover.switchDiscoverSubTab('preferences')" class="text-[11px] font-bold text-[#E50914] uppercase">Edit Preferences</button>
+                        </div>
+                        <div id="discover-personalized-rail" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar"></div>
+                    </div>
+
+                    <!-- Trending Worldwide -->
+                    <div>
+                        <h2 class="text-lg font-black text-white uppercase tracking-tight mb-3">Trending Worldwide</h2>
+                        <div id="discover-trending-rail" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar"></div>
+                    </div>
+
+                    <!-- Coming This Week -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-black text-white uppercase tracking-tight">Coming This Week</h2>
+                            <span class="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-400">Confirmed Dates</span>
+                        </div>
+                        <div id="discover-week-rail" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar"></div>
+                    </div>
+
+                    <!-- Upcoming Movies -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-black text-white uppercase tracking-tight">Upcoming Movies</h2>
+                            <button onclick="window.nfDiscover.switchDiscoverSubTab('calendar'); window.nfDiscover.setCalendarFilter('movie');" class="text-[11px] font-bold text-gray-300 hover:text-white uppercase">View in Calendar →</button>
+                        </div>
+                        <div id="discover-upcoming-movies-rail" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar"></div>
+                    </div>
+
+                    <!-- Upcoming TV Episodes -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-black text-white uppercase tracking-tight">Upcoming TV Episodes</h2>
+                            <button onclick="window.nfDiscover.switchDiscoverSubTab('calendar'); window.nfDiscover.setCalendarFilter('episode');" class="text-[11px] font-bold text-gray-300 hover:text-white uppercase">Episode Schedule →</button>
+                        </div>
+                        <div id="discover-upcoming-episodes-rail" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar"></div>
+                    </div>
+
+                    <!-- Newly Announced Releases -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-black text-white uppercase tracking-tight">Newly Announced Releases</h2>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Confirmed vs Estimated Badges</span>
+                        </div>
+                        <div id="discover-announced-rail" class="flex gap-3 overflow-x-auto pb-2 no-scrollbar"></div>
+                    </div>
+                </section>
+
+                <!-- DISCOVER PANEL 2: RELEASE CALENDAR -->
+                <section id="discover-panel-calendar" class="discover-subpanel hidden space-y-5">
+                    <div class="ios-card p-4 space-y-4">
+                        <!-- Top Nav Controls -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.nfDiscover.shiftCalendar(-1)" class="ios-glass-light px-3 py-2 text-sm font-black text-white">‹</button>
+                                <button onclick="window.nfDiscover.jumpCalendarToday()" class="ios-btn-red px-4 py-2 text-xs font-black uppercase tracking-wider">Today</button>
+                                <button onclick="window.nfDiscover.shiftCalendar(1)" class="ios-glass-light px-3 py-2 text-sm font-black text-white">›</button>
+                                <h2 id="cal-period-title" class="text-lg md:text-xl font-black text-white ml-2">Calendar</h2>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="window.nfDiscover.setCalendarMode('month')" data-mode="month" class="cal-mode-btn discover-tab-btn active px-3 py-1.5 text-xs font-black uppercase">Monthly</button>
+                                <button onclick="window.nfDiscover.setCalendarMode('week')" data-mode="week" class="cal-mode-btn discover-tab-btn px-3 py-1.5 text-xs font-black uppercase">Weekly</button>
+                                <button onclick="window.nfDiscover.setCalendarMode('day')" data-mode="day" class="cal-mode-btn discover-tab-btn px-3 py-1.5 text-xs font-black uppercase">Daily</button>
+                            </div>
+                        </div>
+
+                        <!-- Release Type Filters -->
+                        <div class="flex flex-wrap items-center gap-1.5 pt-2 border-t border-white/10">
+                            <button onclick="window.nfDiscover.setCalendarFilter('all')" data-filter="all" class="cal-filter-btn discover-tab-btn active px-3 py-1.5 text-[11px] font-bold uppercase">All</button>
+                            <button onclick="window.nfDiscover.setCalendarFilter('movie')" data-filter="movie" class="cal-filter-btn discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase">Movies</button>
+                            <button onclick="window.nfDiscover.setCalendarFilter('tv')" data-filter="tv" class="cal-filter-btn discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase">TV Series</button>
+                            <button onclick="window.nfDiscover.setCalendarFilter('anime')" data-filter="anime" class="cal-filter-btn discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase">Anime</button>
+                            <button onclick="window.nfDiscover.setCalendarFilter('episode')" data-filter="episode" class="cal-filter-btn discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase">Episodes</button>
+                            <button onclick="window.nfDiscover.setCalendarFilter('theatrical')" data-filter="theatrical" class="cal-filter-btn discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase">Theatrical</button>
+                            <button onclick="window.nfDiscover.setCalendarFilter('streaming')" data-filter="streaming" class="cal-filter-btn discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase">Streaming</button>
+                            <button id="cal-prefs-toggle" onclick="window.nfDiscover.toggleCalendarPrefsFilter()" class="discover-tab-btn px-3 py-1.5 text-[11px] font-bold uppercase ml-auto">★ My Preferences</button>
+                        </div>
+                    </div>
+
+                    <!-- Calendar Grid -->
+                    <div id="calendar-grid-container" class="ios-card overflow-hidden"></div>
+
+                    <!-- Complete Day Schedule Drawer -->
+                    <div id="cal-day-schedule" class="ios-card p-4"></div>
+                </section>
+
+                <!-- DISCOVER PANEL 3: EXPLORE BY COUNTRY/INDUSTRY, STREAMING PLATFORM, CONTENT TYPE & GENRE -->
+                <section id="discover-panel-explore" class="discover-subpanel hidden space-y-6">
+                    <!-- Quick Combo Presets -->
+                    <div class="ios-card p-4 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Quick Combos:</span>
+                            <button onclick="window.nfDiscover.jumpToExplore({industry:'korean', platform:'netflix', genre:'thriller'})" class="select-tile px-3 py-1.5 text-[11px] font-bold text-white">South Korean + Netflix + Thriller</button>
+                            <button onclick="window.nfDiscover.jumpToExplore({industry:'bollywood', platform:'prime'})" class="select-tile px-3 py-1.5 text-[11px] font-bold text-white">Bollywood + Prime Video</button>
+                            <button onclick="window.nfDiscover.jumpToExplore({contentType:'anime', platform:'crunchyroll', genre:'action'})" class="select-tile px-3 py-1.5 text-[11px] font-bold text-white">Anime + Crunchyroll + Action</button>
+                            <button onclick="window.nfDiscover.jumpToExplore({industry:'south_indian', genre:'action'})" class="select-tile px-3 py-1.5 text-[11px] font-bold text-white">South Indian + Action</button>
+                        </div>
+                        <button onclick="window.nfDiscover.clearAllExploreFilters()" class="ios-glass-light px-3 py-1.5 text-[11px] font-black uppercase text-red-400 hover:text-white">Reset Filters</button>
+                    </div>
+
+                    <!-- Section 4: Country & Film Industry -->
+                    <div class="ios-card p-4 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-sm font-black uppercase tracking-widest text-white">Explore by Country &amp; Film Industry</h2>
+                            <span class="text-[10px] text-gray-400 uppercase font-bold">Multi-select • Parent &amp; Subcategories</span>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-wider text-[#E50914] mb-2">Major Film Industries</p>
+                            <div id="explore-industries-major" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"></div>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-wider text-gray-300 mb-2">International Entertainment</p>
+                            <div id="explore-industries-intl" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Streaming Platforms -->
+                    <div class="ios-card p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <h2 class="text-sm font-black uppercase tracking-widest text-white">Explore by Streaming Platform</h2>
+                            <span class="text-[11px] font-bold text-emerald-400">Region Verified: <strong id="explore-platform-region-label">US</strong></span>
+                        </div>
+                        <div id="explore-platforms" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"></div>
+                    </div>
+
+                    <!-- Section 6: Content Types & Genres -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div class="ios-card p-4">
+                            <h2 class="text-sm font-black uppercase tracking-widest text-white mb-3">Content Type</h2>
+                            <div id="explore-content-types" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2"></div>
+                        </div>
+                        <div class="ios-card p-4">
+                            <h2 class="text-sm font-black uppercase tracking-widest text-white mb-3">Genres</h2>
+                            <div id="explore-genres" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 gap-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Filtered Results Grid -->
+                    <div class="space-y-3">
+                        <div id="explore-active-summary" class="ios-card p-3 flex flex-wrap items-center gap-2"></div>
+                        <div id="explore-results-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
+                        <div class="text-center pt-2">
+                            <button id="explore-load-more-btn" onclick="window.nfDiscover.loadMoreExploreResults()" class="hidden ios-btn-primary px-6 py-3 text-xs font-black uppercase tracking-wider">Load More Titles</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DISCOVER PANEL 4: MY PREFERENCES -->
+                <section id="discover-panel-preferences" class="discover-subpanel hidden">
+                    <div id="discover-preferences-body"></div>
+                </section>
+            </div>
+        </main>
+
+        <!-- 3. MOVIES -->
+        <main id="view-movies" class="app-view relative !pt-[76px]" onscroll="handleInfiniteScroll(event, 'movies')">
+            <div class="max-w-7xl mx-auto">
+                <h1 class="text-3xl font-black px-5 pt-4 mb-3 text-white tracking-tight uppercase">Movies</h1>
+                <div class="mx-5 mb-6 ios-glass-light p-1.5">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="movies-tabs">
+                        <button onclick="fetchCategory('movies', 'all', this)" class="bg-white text-black px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-white shadow-md">All Movies</button>
+                        <button onclick="fetchCategory('movies', 'hollywood', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Hollywood</button>
+                        <button onclick="fetchCategory('movies', 'bollywood', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Bollywood</button>
+                        <button onclick="fetchCategory('movies', 'tollywood', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Tollywood</button>
+                        <button onclick="fetchCategory('movies', 'korean', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Korean</button>
+                        <button onclick="fetchCategory('movies', 'indonesian', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Indonesian</button>
+                        <button onclick="fetchCategory('movies', 'punjabi', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Punjabi</button>
+                    </div>
+                </div>
+                <div id="movies-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 px-5 pb-4"></div>
+                <div id="movies-loader" class="hidden text-center py-4"><div class="nf-spinner animate-spin w-6 h-6 border-2 border-[#E50914] border-t-transparent mx-auto"></div></div>
+            </div>
+        </main>
+
+        <!-- 4. WEB SERIES -->
+        <main id="view-series" class="app-view relative !pt-[76px]" onscroll="handleInfiniteScroll(event, 'series')">
+            <div class="max-w-7xl mx-auto">
+                <h1 class="text-3xl font-black px-5 pt-4 mb-3 text-white tracking-tight uppercase">Web Series</h1>
+                <div class="mx-5 mb-6 ios-glass-light p-1.5">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="series-tabs">
+                        <button onclick="fetchCategory('series', 'all', this)" class="bg-white text-black px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-white shadow-md">All Series</button>
+                        <button onclick="fetchCategory('series', 'hollywood', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Hollywood</button>
+                        <button onclick="fetchCategory('series', 'bollywood', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Bollywood</button>
+                        <button onclick="fetchCategory('series', 'tollywood', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Tollywood</button>
+                        <button onclick="fetchCategory('series', 'korean', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Korean</button>
+                        <button onclick="fetchCategory('series', 'indonesian', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Indonesian</button>
+                        <button onclick="fetchCategory('series', 'punjabi', this)" class="bg-transparent text-white/70 hover:text-white px-4 py-2 text-[13px] font-bold flex-shrink-0 transition-all border border-transparent">Punjabi</button>
+                    </div>
+                </div>
+                <div id="series-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 px-5 pb-4"></div>
+                <div id="series-loader" class="hidden text-center py-4"><div class="nf-spinner animate-spin w-6 h-6 border-2 border-[#E50914] border-t-transparent mx-auto"></div></div>
+            </div>
+        </main>
+
+        <!-- 5. SEARCH -->
+        <main id="view-search" class="app-view relative !pt-[16px]">
+            <div class="sticky top-0 ios-glass-heavy pt-safe px-5 pb-4 z-40 border-b border-white/10">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex items-center gap-2 mt-3">
+                        <button onclick="closeSearchView()" class="ios-glass-light p-3.5 text-white hover:bg-white/15 active:scale-95 flex-shrink-0" title="Back" aria-label="Back">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        </button>
+                        <div class="flex-1 flex items-center bg-[#09090c] px-4 py-3.5 border border-white/20 focus-within:border-white transition-all">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="search-input" placeholder="Search any movie, TV show, actor, or director..." class="bg-transparent border-none outline-none text-white w-full ml-3 text-[15px] font-medium placeholder-gray-400">
+                        </div>
+                    </div>
+                    <div id="search-filter-tabs" class="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
+                        <button onclick="setGlobalSearchFilter('all', this)" class="discover-tab-btn active px-3 py-1.5 text-[12px] font-bold uppercase tracking-wider">All</button>
+                        <button onclick="setGlobalSearchFilter('movie', this)" class="discover-tab-btn px-3 py-1.5 text-[12px] font-bold uppercase tracking-wider">Movies</button>
+                        <button onclick="setGlobalSearchFilter('tv', this)" class="discover-tab-btn px-3 py-1.5 text-[12px] font-bold uppercase tracking-wider">TV Shows</button>
+                        <button onclick="setGlobalSearchFilter('person', this)" class="discover-tab-btn px-3 py-1.5 text-[12px] font-bold uppercase tracking-wider">Actors &amp; Directors</button>
+                    </div>
+                </div>
+            </div>
+            <div id="search-grid" class="max-w-7xl mx-auto grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5 px-5 pt-6 pb-10"></div>
+        </main>
+
+        <!-- 6. PROFILE, WISHLIST & ACCOUNT -->
+        <main id="view-profile" class="app-view relative !pt-[76px]">
+            <div class="max-w-5xl mx-auto px-5 pt-4 pb-12 space-y-6">
+                <h1 class="text-3xl font-black text-white tracking-tight uppercase">Profile &amp; Watchlist</h1>
+                <div id="profile-view-body"></div>
+
+                <!-- Watchlist / Wishlist Integrated Inside Profile -->
+                <section id="profile-watchlist-section" class="ios-card p-4 md:p-5">
+                    <div class="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+                        <div>
+                            <h2 class="text-lg font-black text-white uppercase tracking-tight">My Watchlist / Wishlist</h2>
+                            <p class="text-xs text-gray-400">Saved movies &amp; series ready to watch anytime</p>
+                        </div>
+                        <button onclick="clearFavourites()" class="ios-glass-light text-red-400 font-black text-xs uppercase tracking-wider px-3.5 py-2 active:scale-95 transition-transform hover:text-white">Clear All</button>
+                    </div>
+                    <div id="my-list-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
+                </section>
+            </div>
+        </main>
+
+        <!-- CLEAN 5-TAB SHARP BOTTOM NAVIGATION BAR -->
+        <div class="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
+            <nav class="bottom-nav-shell max-w-3xl mx-auto flex justify-between items-stretch pointer-events-auto pb-safe" id="main-bottom-nav">
+                <div onclick="switchTab('home', this)" id="nav-home" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                    <span>Home</span>
+                </div>
+                <div onclick="switchTab('discover', this)" id="nav-discover" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    <span>Discover</span>
+                </div>
+                <div onclick="switchTab('movies', this)" id="nav-movies" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                    <span>Movies</span>
+                </div>
+                <div onclick="switchTab('series', this)" id="nav-series" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="15"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+                    <span>Series</span>
+                </div>
+                <div onclick="switchTab('profile', this)" id="nav-profile" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>Profile</span>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- DETAILS MODAL (REUSED BY ALL SECTIONS) -->
+    <div id="details-modal" class="hidden fixed inset-0 z-[600] bg-black flex-col overflow-y-auto">
+        <div class="relative w-full aspect-video max-h-[55vh] bg-black flex-shrink-0">
+            <img id="detail-backdrop" src="" class="w-full h-full object-cover opacity-80" />
+            <div class="absolute top-safe w-full px-4 flex justify-between items-center z-20">
+                <button onclick="closeDetails()" class="bg-black/75 border border-white/25 text-white p-2.5 hover:bg-black transition">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>
+        </div>
+        <div class="px-4 md:px-8 pb-20 w-full max-w-5xl mx-auto z-10 flex flex-col pt-3">
+            <span class="text-[#E50914] font-black text-[12px] tracking-[0.2em] mb-1 block">NETFILLA</span>
+            <h1 id="detail-title" class="text-3xl md:text-4xl font-black text-white mb-2 leading-tight tracking-tight">Title</h1>
+            <div class="flex items-center flex-wrap gap-2 text-gray-400 text-[13px] font-bold mb-3" id="detail-metadata"></div>
+            <div class="flex items-center gap-2 mb-4" id="detail-top10-box">
+                <div class="bg-[#E50914] text-white font-black text-[9px] leading-tight px-1.5 py-0.5 text-center">TOP</div>
+                <span class="text-white font-bold text-[14px] tracking-wide" id="detail-top10-text">Feature</span>
+            </div>
+            <div id="detail-watch-providers"></div>
+            <button onclick="playMovie(currentDetailMovieId)" class="ios-btn-primary w-full font-black py-3.5 flex items-center justify-center gap-2 mb-3 active:scale-[0.98] uppercase tracking-wider">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="black"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Play
+            </button>
+            <p id="detail-overview" class="text-white text-[14px] leading-relaxed mb-3 mt-2">Loading description...</p>
+            <div class="text-gray-400 text-[13px] leading-snug space-y-1 mb-6"><p id="detail-cast" class="truncate">Starring: ...</p></div>
+            <div class="flex justify-start gap-10 text-gray-400 mb-6 pl-2" id="action-row-icons"></div>
+            <div class="flex gap-6 border-t-[3px] border-transparent pt-3 border-b border-gray-800 relative mb-4 mt-2 overflow-x-auto no-scrollbar" id="detail-tabs-container">
+                <div id="tab-indicator" class="absolute top-0 left-0 h-[4px] bg-[#E50914] transition-all duration-300"></div>
+                <button onclick="switchDetailsTab('episodes')" id="btn-tab-episodes" class="detail-tab hidden">Episodes</button>
+                <button onclick="switchDetailsTab('trailers')" id="btn-tab-trailers" class="detail-tab">Trailers &amp; More</button>
+                <button onclick="switchDetailsTab('similar')" id="btn-tab-similar" class="detail-tab active">More Like This</button>
+            </div>
+            <div id="tab-content-episodes" class="hidden flex-col gap-4"></div>
+            <div id="tab-content-trailers" class="hidden flex-col gap-6"></div>
+            <div id="tab-content-similar" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
+        </div>
+    </div>
+
+    <!-- PLAYER MODAL -->
+    <div id="player-modal" class="hidden fixed inset-0 z-[700] bg-black flex-col">
+        <div class="absolute top-safe right-4 z-50 pt-2">
+            <button onclick="closePlayer()" class="bg-black/70 p-3 text-white active:scale-95 border border-white/25 hover:bg-[#E50914] transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <iframe id="video-frame" class="w-full h-full border-none bg-black" src="" allowfullscreen></iframe>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/discover-data.js"></script>
+    <script src="js/app-core.js"></script>
+    <script src="js/discover.js"></script>
+</body>
+</html>
